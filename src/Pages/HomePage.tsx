@@ -41,26 +41,37 @@ const HomePage = () => {
         show: false,
       },
     },
-    colors: ["#008FFB"],
   };
 
   const chartTypes = ["line", "radar", "bar", "scatter", "treemap"];
+  const chartColors = ["#008FFB", "#00C454", "#FFBB44", "#FF6464", "#A67BFF"];
+
+  const handleLogOut = () => {
+    localStorage.clear();
+    navigate("/signin");
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center flex-col">
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold mb-4">
           Welcome to the HomePage,{" "}
           <span className="text-blue-500">{userName}</span>!
         </h1>
+        <button
+          onClick={handleLogOut}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Log Out
+        </button>
       </div>
-      {chartTypes.map((chartType) => (
+      {chartTypes.map((chartType, index) => (
         <div className="mb-4" key={chartType}>
           <p className="text-center font-bold text-lg my-2">
             {chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart
           </p>
           <Chart
-            options={chartOptions}
+            options={{ ...chartOptions, colors: [chartColors[index]] }}
             series={[{ data: chartData }]}
             type={chartType as any}
             width="500"
