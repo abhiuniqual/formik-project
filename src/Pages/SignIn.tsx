@@ -79,7 +79,7 @@ const SignIn = () => {
         </div>
         <div className="flex items-center justify-between">
           <button
-            className="bg-blue-600 w-full hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-[#553fff] w-full hover:bg-[#3d3bb7] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Sign In
