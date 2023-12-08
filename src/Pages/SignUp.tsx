@@ -1,9 +1,31 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../Hooks/useAuth";
 
 const SignUpSchema = Yup.object().shape({
-  name: Yup.string().required("Required"),
+  firstName: Yup.string().test(
+    "required",
+    "Either First Name or Last Name is required",
+    function (value) {
+      const { lastName } = this.parent;
+      return (
+        !(!value || value.trim() === "") || !lastName || lastName.trim() === ""
+      );
+    }
+  ),
+  lastName: Yup.string().test(
+    "required",
+    "Either First Name or Last Name is required",
+    function (value) {
+      const { firstName } = this.parent;
+      return (
+        !(!value || value.trim() === "") ||
+        !firstName ||
+        firstName.trim() === ""
+      );
+    }
+  ),
   email: Yup.string().email("Invalid email").required("Required"),
   password: Yup.string()
     .required("Required")
@@ -15,18 +37,25 @@ const SignUpSchema = Yup.object().shape({
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const formik = useFormik({
     initialValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
     validationSchema: SignUpSchema,
     onSubmit: (values) => {
+      const signUpDetails = {
+        name: values.firstName || values.lastName,
+        email: values.email,
+      };
+      login(signUpDetails);
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userName", values.name);
+      localStorage.setItem("userName", values.firstName || values.lastName);
       navigate("/");
     },
   });
@@ -39,30 +68,54 @@ const SignUp = () => {
       >
         <div className="mb-4">
           <p className="text-center my-2 text-lg font-semibold text-white">
-            SignUp Here...
+            Create Your Account 🔓
           </p>
         </div>
-        <div className="mb-4">
-          <label
-            className="block text-white text-md font-bold mb-2"
-            htmlFor="name"
-          >
-            Name
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
-            type="text"
-            name="name"
-            placeholder="Name"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.name}
-          />
-          {formik.touched.name && formik.errors.name && (
-            <p className="text-red-500 text-sm my-1 italic font-semibold">
-              {formik.errors.name}
-            </p>
-          )}
+        <div className="mb-4 flex sm: gap-2 w-full">
+          <div className="w-full md:w-1/2">
+            <label
+              className="block text-white text-md font-bold mb-2"
+              htmlFor="firstName"
+            >
+              First Name
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              name="firstName" // Use a unique name for the first name input
+              placeholder="First Name"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.firstName}
+            />
+            {formik.touched.firstName && formik.errors.firstName && (
+              <p className="text-red-500 text-sm my-1 italic font-semibold">
+                {formik.errors.firstName}
+              </p>
+            )}
+          </div>
+          <div className="w-full md:w-1/2">
+            <label
+              className="block text-white text-md font-bold mb-2"
+              htmlFor="lastName"
+            >
+              Last Name
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              name="lastName" // Use a unique name for the last name input
+              placeholder="Last Name"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.lastName}
+            />
+            {formik.touched.lastName && formik.errors.lastName && (
+              <p className="text-red-500 text-sm my-1 italic font-semibold">
+                {formik.errors.lastName}
+              </p>
+            )}
+          </div>
         </div>
         <div className="mb-4">
           <label
@@ -130,11 +183,19 @@ const SignUp = () => {
             </p>
           )}
         </div>
+        <div className="mb-6 flex justify-center text-white divide-x-2 gap-2 font-medium">
+          <p>Already have an account?</p>
+          <div className="divide-x">
+            <Link to="/signin" className="hover:underline px-2 font-bold">
+              SignIn
+            </Link>
+          </div>
+        </div>
         <button
           className="bg-[#553fff] w-full hover:bg-[#3d3bb7] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
         >
-          Sign Up
+          Sign Up 🤗
         </button>
       </form>
     </div>

@@ -2,15 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Chart from "react-apexcharts";
 import axios from "axios";
+import { useAuth } from "../Hooks/useAuth";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const userName = localStorage.getItem("userName");
+  const { user } = useAuth();
+
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!user) {
       navigate("/");
       return;
     }
@@ -33,7 +34,7 @@ const HomePage = () => {
     };
 
     fetchData();
-  }, [isLoggedIn, navigate]);
+  }, [user, navigate]);
 
   const chartOptions = {
     chart: {
@@ -52,17 +53,16 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col max-w-2xl mx-auto my-4">
-      <div className="mb-4 flex justify-between items-center">
+    <div className="min-h-screen flex flex-col max-w-2xl mx-auto my-4 px-4">
+      <div className="mb-4 flex text-center flex-col md:flex-row justify-between items-center">
         <h1 className="text-2xl font-bold mb-4 ">
-          Welcome to the HomePage,{" "}
-          <span className="text-blue-500">{userName}</span>!
+          {user ? `Welcome, ${user.name}!` : "Welcome to the HomePage!"}
         </h1>
         <button
           onClick={handleLogOut}
           className="bg-[#553fff] hover:bg-[#3d3bb7] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          Log Out
+          {user ? "Logout 😦" : "User not available 😞"}
         </button>
       </div>
       {chartTypes.map((chartType, index) => (
