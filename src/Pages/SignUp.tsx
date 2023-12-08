@@ -4,28 +4,34 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../Hooks/useAuth";
 
 const SignUpSchema = Yup.object().shape({
-  firstName: Yup.string().test(
-    "required",
-    "Either First Name or Last Name is required",
-    function (value) {
-      const { lastName } = this.parent;
-      return (
-        !(!value || value.trim() === "") || !lastName || lastName.trim() === ""
+  firstName: Yup.string().test(function (value) {
+    const { lastName } = this.parent;
+    if (
+      !(value && value.trim() !== "") &&
+      (!lastName || lastName.trim() === "")
+    ) {
+      throw new Yup.ValidationError(
+        "Either First Name or Last Name is required",
+        value,
+        "firstName"
       );
     }
-  ),
-  lastName: Yup.string().test(
-    "required",
-    "Either First Name or Last Name is required",
-    function (value) {
-      const { firstName } = this.parent;
-      return (
-        !(!value || value.trim() === "") ||
-        !firstName ||
-        firstName.trim() === ""
+    return true;
+  }),
+  lastName: Yup.string().test(function (value) {
+    const { firstName } = this.parent;
+    if (
+      !(value && value.trim() !== "") &&
+      (!firstName || firstName.trim() === "")
+    ) {
+      throw new Yup.ValidationError(
+        "Either First Name or Last Name is required",
+        value,
+        "lastName"
       );
     }
-  ),
+    return true;
+  }),
   email: Yup.string().email("Invalid email").required("Required"),
   password: Yup.string()
     .required("Required")
@@ -71,51 +77,54 @@ const SignUp = () => {
             Create Your Account 🔓
           </p>
         </div>
-        <div className="mb-4 flex sm: gap-2 w-full">
-          <div className="w-full md:w-1/2">
-            <label
-              className="block text-white text-md font-bold mb-2"
-              htmlFor="firstName"
-            >
-              First Name
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              name="firstName" // Use a unique name for the first name input
-              placeholder="First Name"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.firstName}
-            />
-            {formik.touched.firstName && formik.errors.firstName && (
+        <div className="mb-4 ">
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="w-full md:w-1/2">
+              <label
+                className="block text-white text-md font-bold mb-2"
+                htmlFor="firstName"
+              >
+                First Name
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
+                type="text"
+                name="firstName"
+                placeholder="First Name"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.firstName}
+              />
+            </div>
+            <div className="w-full md:w-1/2">
+              <label
+                className="block text-white text-md font-bold mb-2"
+                htmlFor="lastName"
+              >
+                Last Name
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
+                type="text"
+                name="lastName"
+                placeholder="Last Name"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.lastName}
+              />
+            </div>
+          </div>
+          {(!formik.touched.firstName && !formik.touched.lastName) ||
+            (formik.touched.firstName && formik.errors.firstName && (
               <p className="text-red-500 text-sm my-1 italic font-semibold">
                 {formik.errors.firstName}
               </p>
-            )}
-          </div>
-          <div className="w-full md:w-1/2">
-            <label
-              className="block text-white text-md font-bold mb-2"
-              htmlFor="lastName"
-            >
-              Last Name
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              name="lastName" // Use a unique name for the last name input
-              placeholder="Last Name"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.lastName}
-            />
-            {formik.touched.lastName && formik.errors.lastName && (
+            )) ||
+            (formik.touched.lastName && formik.errors.lastName && (
               <p className="text-red-500 text-sm my-1 italic font-semibold">
                 {formik.errors.lastName}
               </p>
-            )}
-          </div>
+            ))}
         </div>
         <div className="mb-4">
           <label
